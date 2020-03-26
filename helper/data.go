@@ -29,6 +29,12 @@ type Data interface {
 	// if boolean attributes have been set, if they are Optional but do not
 	// have a Default value.
 	GetOkExists(key string) (interface{}, bool)
+
+	// Set sets the value for the given key.
+	//
+	// If the key is invalid or the value is not a correct type, an error
+	// will be returned.
+	Set(key string, value interface{}) error
 }
 
 var _ Data = (*schema.ResourceData)(nil)
@@ -68,6 +74,12 @@ func (md MapData) Get(key string) interface{} {
 func (md MapData) GetOkExists(key string) (interface{}, bool) {
 	v, ok := md[key]
 	return v, ok && !isNil(v) && !isZero(v)
+}
+
+// Set sets the value for the given key.
+func (md MapData) Set(key string, value interface{}) error {
+	md[key] = value
+	return nil
 }
 
 func isNil(v interface{}) bool {

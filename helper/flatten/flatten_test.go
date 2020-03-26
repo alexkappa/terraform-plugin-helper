@@ -1,13 +1,17 @@
 package flatten
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/alexkappa/terraform-plugin-helper/helper"
+)
 
 type flattener struct {
 	foo string
 }
 
-func (f flattener) Flatten(m map[string]interface{}) {
-	m["foo"] = f.foo
+func (f flattener) Flatten(d helper.Data) {
+	d.Set("foo", f.foo)
 }
 
 func TestFlatten(t *testing.T) {
@@ -16,8 +20,8 @@ func TestFlatten(t *testing.T) {
 }
 
 func TestFlattenFunc(t *testing.T) {
-	flat := FlattenFunc(func(m map[string]interface{}) {
-		m["foo"] = "bar"
+	flat := FlattenFunc(func(d helper.Data) {
+		d.Set("foo", "bar")
 	})
 	t.Logf("%v", flat) // [map[foo:bar]]
 }
@@ -35,8 +39,8 @@ type item struct{ name string }
 
 type itemFlattener item
 
-func (i itemFlattener) Flatten(m map[string]interface{}) {
-	m["name"] = i.name
+func (i itemFlattener) Flatten(d helper.Data) {
+	d.Set("name", i.name)
 }
 
 func TestFlattenListWrap(t *testing.T) {
@@ -49,8 +53,8 @@ func TestFlattenListWrap(t *testing.T) {
 }
 
 func itemFlattenerAlt(i item) Flattener {
-	return FlattenerFunc(func(m map[string]interface{}) {
-		m["name"] = i.name
+	return FlattenerFunc(func(d helper.Data) {
+		d.Set("name", i.name)
 	})
 }
 
@@ -65,24 +69,38 @@ func TestFlattenListWrapAlt(t *testing.T) {
 
 func TestFlattenListFunc(t *testing.T) {
 	items := []item{{"foo"}, {"bar"}}
-	flat := FlattenListFunc(items, func(i interface{}, m map[string]interface{}) {
-		m["name"] = i.(item).name
+	flat := FlattenListFunc(items, func(i interface{}, d helper.Data) {
+		d.Set("name", i.(item).name)
 	})
 	t.Logf("%v", flat)
 }
 
 func TestFlattenNested(t *testing.T) {
 	type bar struct{ baz string }
-	type foo struct{ bar *bar }
+	type foo struct {
+		bar  *bar
+		bars []*bar
+	}
 
-	v := &foo{&bar{"hey!"}}
+	v := &foo{
+		bar: &bar{
+			baz: "hey!",
+		},
+		bars: []*bar{
+			{baz: "one"},
+			{baz: "two"},
+		},
+	}
 
-	flat := FlattenFunc(func(m map[string]interface{}) {
-		m["bar"] = FlattenFunc(func(m map[string]interface{}) {
-			m["baz"] = v.bar.baz
-		})
+	flat := FlattenFunc(func(d helper.Data) {
+		d.Set("bar", FlattenFunc(func(d helper.Data) {
+			d.Set("baz", v.bar.baz)
+		}))
+		d.Set("bars", FlattenListFunc(v.bars, func(b interface{}, d helper.Data) {
+			d.Set("baz", b.(*bar).baz)
+		}))
 	})
-	t.Logf("%v", flat)
+	t.Logf("%v", flat) // [map[bar:[map[baz:hey!]] bars:[map[baz:one] map[baz:two]]]]
 }
 
 func TestList(t *testing.T) {
