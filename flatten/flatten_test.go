@@ -3,7 +3,7 @@ package flatten
 import (
 	"testing"
 
-	"github.com/alexkappa/terraform-plugin-helper/helper"
+	helper "github.com/alexkappa/terraform-plugin-helper"
 )
 
 type flattener struct {
@@ -101,8 +101,4 @@ func TestFlattenNested(t *testing.T) {
 		}))
 	})
 	t.Logf("%v", flat) // [map[bar:[map[baz:hey!]] bars:[map[baz:one] map[baz:two]]]]
-}
-
-func TestList(t *testing.T) {
-
 }

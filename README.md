@@ -4,7 +4,40 @@ Re-usable helpers for building your next terraform provider.
 
 ## What is this?
 
-If you've been down the path of developing a terraform provider before, you might have had to write a lot of code to translate data from a terraform `schema.ResourceData` to your own API's format.
+If you've been down the path of developing a terraform provider before, you might have had to write a lot of code translating data from a terraform [`schema.ResourceData`](https://godoc.org/github.com/hashicorp/terraform-plugin-sdk/helper/schema#ResourceData) to your own API's format and the other way around.
+
+In the [Implementing Create](https://www.terraform.io/docs/extend/writing-custom-providers.html#implement-create) and [Implementing Read](https://www.terraform.io/docs/extend/writing-custom-providers.html#implementing-read) guides, explain how to write your own logic of creating and reading upstream resources using Terraform.
+
+The guide to [Implementing a more complex Read](https://www.terraform.io/docs/extend/writing-custom-providers.html#implementing-a-more-complex-read) is where `flattening` is introduced, and how it is used to map a nested object from an API into the `terraform.state`. The inverse is called `expanding` and it is used to map the terraform configuration to an API object.
+
+## Flatten
+
+The `flatten` package contains several helper functions to deal with flattening.
+
+Using the [more complex example](https://www.terraform.io/docs/extend/writing-custom-providers.html#implementing-a-more-complex-read) from the Terraform docs, we can rewrite the `flattenTaskSpec` function as follows using helper functions from this package.
+
+```go
+func flattenTaskSpec(in *server.TaskSpec) []interface{} {
+    return flatten.FlattenFunc(func(m map[string]interface{}) {
+        if in.ContainerSpec != nil {
+            m["container_spec"] = flatten.FlattenFunc(func(m map[string]interface{}) {
+                if in.ContainerSpec.Mounts != nil && len(in.ContainerSpec.Mounts) > 0 {
+                    
+                }
+            })
+        }
+    })
+    
+    // NOTE: the top level structure to set is a map
+    m := make(map[string]interface{})
+    if in.ContainerSpec != nil {
+      m["container_spec"] = flattenContainerSpec(in.ContainerSpec)
+    }
+    /// ...
+
+    return []interface{}{m}
+}
+```
 
 Here's a hypothetical `schema.CreateFunc` we've defined to create an example resource using a hypothetical API. 
 
