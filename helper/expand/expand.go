@@ -5,7 +5,7 @@ package expand
 import (
 	"strconv"
 
-	"github.com/alexkappa/terraform-plugin-helper"
+	"github.com/alexkappa/terraform-plugin-helper/helper"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/structure"
 )
@@ -32,10 +32,6 @@ func (d *data) GetChange(key string) (interface{}, interface{}) {
 
 func (d *data) Get(key string) interface{} {
 	return d.Data.Get(d.prefix + "." + key)
-}
-
-func (d *data) GetOk(key string) (interface{}, bool) {
-	return d.Data.GetOk(d.prefix + "." + key)
 }
 
 func (d *data) GetOkExists(key string) (interface{}, bool) {
@@ -121,16 +117,22 @@ type Iterator interface {
 	// making data access more intuitive for nested structures.
 	Elem(func(d helper.Data))
 
+	// Range iterates over all elements of the list, calling fn in each iteration.
+	Range(func(k int, v interface{}))
+
 	// List returns the underlying list as a Go slice.
 	List() []interface{}
-
-	// Len returns the number of elements in the list.
-	Len() int
 }
 
 type list struct {
 	d helper.Data
 	v []interface{}
+}
+
+func (l *list) Range(fn func(key int, value interface{})) {
+	for key, value := range l.v {
+		fn(key, value)
+	}
 }
 
 func (l *list) Elem(fn func(helper.Data)) {
@@ -141,10 +143,6 @@ func (l *list) Elem(fn func(helper.Data)) {
 
 func (l *list) List() []interface{} {
 	return l.v
-}
-
-func (l *list) Len() int {
-	return len(l.v)
 }
 
 type set struct {
@@ -160,6 +158,12 @@ func (s *set) hash(item interface{}) string {
 	return strconv.Itoa(code)
 }
 
+func (s *set) Range(fn func(key int, value interface{})) {
+	for key, value := range s.s.List() {
+		fn(key, value)
+	}
+}
+
 func (s *set) Elem(fn func(helper.Data)) {
 	for _, v := range s.s.List() {
 		fn(dataAtKey(s.hash(v), s.d))
@@ -168,10 +172,6 @@ func (s *set) Elem(fn func(helper.Data)) {
 
 func (s *set) List() []interface{} {
 	return s.s.List()
-}
-
-func (s *set) Len() int {
-	return s.s.Len()
 }
 
 // Diff accesses the value held by key and type asserts it to a set. It then

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/alexkappa/terraform-plugin-helper"
+	"github.com/alexkappa/terraform-plugin-helper/helper"
 )
 
 // A Flattener is used to flatten data into Terraform's internal representation.

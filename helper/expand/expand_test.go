@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	helper "github.com/alexkappa/terraform-plugin-helper"
+	"github.com/alexkappa/terraform-plugin-helper/helper"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 

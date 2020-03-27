@@ -24,13 +24,6 @@ type Data interface {
 	// in the schema.
 	Get(key string) interface{}
 
-	// GetOk returns the data for the given key and whether or not the key
-	// has been set to a non-zero value at some point.
-	//
-	// The first result will not necessarilly be nil if the value doesn't exist.
-	// The second result should be checked to determine this information.
-	GetOk(key string) (interface{}, bool)
-
 	// GetOkExists returns the data for a given key and whether or not the key
 	// has been set to a non-zero value. This is only useful for determining
 	// if boolean attributes have been set, if they are Optional but do not
@@ -74,13 +67,6 @@ func (md MapData) GetChange(key string) (interface{}, interface{}) {
 // the map.
 func (md MapData) Get(key string) interface{} {
 	return md[key]
-}
-
-// GetOk returns the data for the given key and whether or not the key has been
-// set.
-func (md MapData) GetOk(key string) (interface{}, bool) {
-	v, ok := md[key]
-	return v, ok
 }
 
 // GetOkExists returns the data for a given key and whether or not the key has
