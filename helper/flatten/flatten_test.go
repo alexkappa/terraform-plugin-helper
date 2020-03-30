@@ -26,12 +26,17 @@ func TestFlattenFunc(t *testing.T) {
 	t.Logf("%v", flat) // [map[foo:bar]]
 }
 
+type flattenerList []flattener
+
+func (f flattenerList) Len() int                     { return len(f) }
+func (f flattenerList) Flatten(i int, d helper.Data) { f[i].Flatten(d) }
+
 func TestFlattenList(t *testing.T) {
-	flatteners := []interface{}{
+	flatteners := []flattener{
 		flattener{"bar"},
 		flattener{"baz"},
 	}
-	flat := FlattenList(flatteners)
+	flat := FlattenList(flattenerList(flatteners))
 	t.Logf("%v", flat) // [map[foo:bar] map[foo:baz]]
 }
 
@@ -44,11 +49,11 @@ func (i itemFlattener) Flatten(d helper.Data) {
 }
 
 func TestFlattenListWrap(t *testing.T) {
-	flatteners := []interface{}{
+	flatteners := []Flattener{
 		itemFlattener(item{"bar"}),
 		itemFlattener(item{"baz"}),
 	}
-	flat := FlattenList(flatteners)
+	flat := FlattenList(FlattenerList(flatteners))
 	t.Logf("%v", flat) // [map[name:bar] map[name:baz]]
 }
 
@@ -59,50 +64,10 @@ func itemFlattenerAlt(i item) Flattener {
 }
 
 func TestFlattenListWrapAlt(t *testing.T) {
-	flatteners := []interface{}{
+	flatteners := []Flattener{
 		itemFlattenerAlt(item{"bar"}),
 		itemFlattenerAlt(item{"baz"}),
 	}
-	flat := FlattenList(flatteners)
+	flat := FlattenList(FlattenerList(flatteners))
 	t.Logf("%v", flat) // [map[name:bar] map[name:baz]]
-}
-
-func TestFlattenListFunc(t *testing.T) {
-	items := []item{{"foo"}, {"bar"}}
-	flat := FlattenListFunc(items, func(i interface{}, d helper.Data) {
-		d.Set("name", i.(item).name)
-	})
-	t.Logf("%v", flat)
-}
-
-func TestFlattenNested(t *testing.T) {
-	type bar struct{ baz string }
-	type foo struct {
-		bar  *bar
-		bars []*bar
-	}
-
-	v := &foo{
-		bar: &bar{
-			baz: "hey!",
-		},
-		bars: []*bar{
-			{baz: "one"},
-			{baz: "two"},
-		},
-	}
-
-	flat := FlattenFunc(func(d helper.Data) {
-		d.Set("bar", FlattenFunc(func(d helper.Data) {
-			d.Set("baz", v.bar.baz)
-		}))
-		d.Set("bars", FlattenListFunc(v.bars, func(b interface{}, d helper.Data) {
-			d.Set("baz", b.(*bar).baz)
-		}))
-	})
-	t.Logf("%v", flat) // [map[bar:[map[baz:hey!]] bars:[map[baz:one] map[baz:two]]]]
-}
-
-func TestList(t *testing.T) {
-
 }

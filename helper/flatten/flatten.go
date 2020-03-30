@@ -1,9 +1,6 @@
 package flatten
 
 import (
-	"fmt"
-	"reflect"
-
 	"github.com/alexkappa/terraform-plugin-helper/helper"
 )
 
@@ -36,75 +33,35 @@ func FlattenFunc(fn func(helper.Data)) []interface{} {
 	return Flatten(FlattenerFunc(fn))
 }
 
-// type FlattenerList []Flattener
-
-// func (fls FlattenerList) Flatten() []interface{} {
-// 	out := make([]interface{}, len(fls))
-// 	for i, f := range fls {
-// 		m := make(helper.MapData)
-// 		f.Flatten(m)
-// 		out[i] = map[string]interface{}(m)
-// 	}
-// 	return out
-// }
-
-func FlattenList(in interface{}) (out []interface{}) {
-
-	v := reflect.ValueOf(in)
-
-	switch v.Kind() {
-	case reflect.Slice, reflect.Array:
-
-		out = make([]interface{}, v.Len())
-
-		for i := 0; i < v.Len(); i++ {
-			f, ok := v.Index(i).Interface().(Flattener)
-			if !ok {
-				panic(fmt.Sprintf("flatten: in[%d] %s is not a Flattener", i, v.Index(i).Type()))
-			}
-			out[i] = f
-		}
-
-	default:
-		panic("flatten: input is not a slice or array type")
-	}
-
-	return
+// List is used when flattening list or set types into Terraform's internal
+// representation.
+//
+// The methods require that the elements of the collection be enumerated by an
+// integer index.
+type List interface {
+	// Len returns the number of elements in the collection.
+	Len() int
+	// Flatten flattens the element at index i into data d.
+	Flatten(i int, d helper.Data)
 }
 
-func FlattenListFunc(in interface{}, fn func(interface{}, helper.Data)) (out []interface{}) {
+// FlattenerList is an implementation of List used to flatten []Flattener.
+type FlattenerList []Flattener
 
-	switch reflect.TypeOf(in).Kind() {
-	case reflect.Slice, reflect.Array:
+// Len returns the number of elements in the collection.
+func (f FlattenerList) Len() int { return len(f) }
 
-		s := reflect.ValueOf(in)
+// Flatten flattens the element at index i into data d.
+func (f FlattenerList) Flatten(i int, d helper.Data) { f[i].Flatten(d) }
 
-		for i := 0; i < s.Len(); i++ {
-			d := make(helper.MapData)
-			fn(s.Index(i).Interface(), d)
-			out = append(out, d)
-		}
-	default:
-		panic("flatten: input is not a slice or array type")
+// FlattenList flattens a List by iterating the List's elements and executing
+// their Flatten method.
+func FlattenList(l List) []interface{} {
+	out := make([]interface{}, 0, l.Len())
+	for i := 0; i < l.Len(); i++ {
+		d := make(helper.MapData)
+		l.Flatten(i, d)
+		out = append(out, map[string]interface{}(d))
 	}
-
-	return
+	return out
 }
-
-// ---
-
-// flatten.ListFunc(in.ContainerSpec.Mounts, func(v interface{}, m map[string]interface{} {
-// 	m["target"] = v.(mount.Mount).Target
-// 	m["source"] = v.(mount.Mount).Source
-// 	m["type"] = v.(mount.Mount).Type
-// }))
-
-// flatten.List(in.ContainerSpec.Mounts).FlattenFunc(func(v interface{}, m map[string]interface{}){
-// 		m["target"] = v.(mount.Mount).Target
-// 		m["source"] = v.(mount.Mount).Source
-// 		m["type"] = v.(mount.Mount).Type
-// })
-
-// func List() Iterator
-
-// Iterator.Flatten()
