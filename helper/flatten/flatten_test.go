@@ -10,7 +10,7 @@ type flattener struct {
 	foo string
 }
 
-func (f flattener) Flatten(d helper.Data) {
+func (f flattener) Flatten(d helper.ResourceData) {
 	d.Set("foo", f.foo)
 }
 
@@ -20,7 +20,7 @@ func TestFlatten(t *testing.T) {
 }
 
 func TestFlattenFunc(t *testing.T) {
-	flat := FlattenFunc(func(d helper.Data) {
+	flat := FlattenFunc(func(d helper.ResourceData) {
 		d.Set("foo", "bar")
 	})
 	t.Logf("%v", flat) // [map[foo:bar]]
@@ -28,8 +28,8 @@ func TestFlattenFunc(t *testing.T) {
 
 type flattenerList []flattener
 
-func (f flattenerList) Len() int                     { return len(f) }
-func (f flattenerList) Flatten(i int, d helper.Data) { f[i].Flatten(d) }
+func (f flattenerList) Len() int                             { return len(f) }
+func (f flattenerList) Flatten(i int, d helper.ResourceData) { f[i].Flatten(d) }
 
 func TestFlattenList(t *testing.T) {
 	flatteners := []flattener{
@@ -44,7 +44,7 @@ type item struct{ name string }
 
 type itemFlattener item
 
-func (i itemFlattener) Flatten(d helper.Data) {
+func (i itemFlattener) Flatten(d helper.ResourceData) {
 	d.Set("name", i.name)
 }
 
@@ -58,7 +58,7 @@ func TestFlattenListWrap(t *testing.T) {
 }
 
 func itemFlattenerAlt(i item) Flattener {
-	return FlattenerFunc(func(d helper.Data) {
+	return FlattenerFunc(func(d helper.ResourceData) {
 		d.Set("name", i.name)
 	})
 }

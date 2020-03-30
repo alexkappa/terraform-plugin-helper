@@ -73,7 +73,7 @@ import "github.com/alexkappa/terraform-plugin-helper/helper"
 
 {{range .}}
 // {{.Func}} accesses the value held by key and type asserts it as a {{.Type}}.
-func {{.Func}}(d helper.Data, key string) ({{.TypeVar}} {{.Type}}) {
+func {{.Func}}(d helper.ResourceData, key string) ({{.TypeVar}} {{.Type}}) {
 	v, ok := get(d, key)
 	if ok {
 		{{.TypeVar}} = v.({{.Type}})
@@ -83,7 +83,7 @@ func {{.Func}}(d helper.Data, key string) ({{.TypeVar}} {{.Type}}) {
 
 // {{.Func}}Ptr accesses the value held by key and type asserts it as a pointer to
 // a {{.Type}}.
-func {{.Func}}Ptr(d helper.Data, key string) ({{.TypeVar}} *{{.Type}}) {
+func {{.Func}}Ptr(d helper.ResourceData, key string) ({{.TypeVar}} *{{.Type}}) {
 	v, ok := get(d, key)
 	if ok {
 		tmp := v.({{.Type}})

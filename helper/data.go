@@ -6,9 +6,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
-// Data generalises schema.ResourceData so that we can reuse the accessor
-// methods defined below.
-type Data interface {
+// The ResourceData interface represents a schema.ResourceData and defines some
+// of its methods that are commonly used by the helper packages.
+type ResourceData interface {
 
 	// IsNewResource reports whether or not the resource is seen for the first
 	// time.
@@ -24,6 +24,10 @@ type Data interface {
 	// in the schema.
 	Get(key string) interface{}
 
+	// GetOk returns the data for the given key and whether or not the key
+	// has been set to a non-zero value at some point.
+	GetOk(key string) (interface{}, bool)
+
 	// GetOkExists returns the data for a given key and whether or not the key
 	// has been set to a non-zero value. This is only useful for determining
 	// if boolean attributes have been set, if they are Optional but do not
@@ -37,7 +41,7 @@ type Data interface {
 	Set(key string, value interface{}) error
 }
 
-var _ Data = (*schema.ResourceData)(nil)
+var _ ResourceData = (*schema.ResourceData)(nil)
 
 // MapData wraps a map satisfying the Data interface, so it can be used in the
 // accessor methods defined below.
@@ -67,6 +71,13 @@ func (md MapData) GetChange(key string) (interface{}, interface{}) {
 // the map.
 func (md MapData) Get(key string) interface{} {
 	return md[key]
+}
+
+// GetOk returns the data for the given key and whether or not the key has been
+// set to a non-zero value at some point.
+func (md MapData) GetOk(key string) (interface{}, bool) {
+	v, ok := md[key]
+	return v, ok
 }
 
 // GetOkExists returns the data for a given key and whether or not the key has

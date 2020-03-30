@@ -5,7 +5,7 @@ package expand
 import "github.com/alexkappa/terraform-plugin-helper/helper"
 
 // String accesses the value held by key and type asserts it as a string.
-func String(d helper.Data, key string) (s string) {
+func String(d helper.ResourceData, key string) (s string) {
 	v, ok := get(d, key)
 	if ok {
 		s = v.(string)
@@ -15,7 +15,7 @@ func String(d helper.Data, key string) (s string) {
 
 // StringPtr accesses the value held by key and type asserts it as a pointer to
 // a string.
-func StringPtr(d helper.Data, key string) (s *string) {
+func StringPtr(d helper.ResourceData, key string) (s *string) {
 	v, ok := get(d, key)
 	if ok {
 		tmp := v.(string)
@@ -25,7 +25,7 @@ func StringPtr(d helper.Data, key string) (s *string) {
 }
 
 // Bool accesses the value held by key and type asserts it as a bool.
-func Bool(d helper.Data, key string) (b bool) {
+func Bool(d helper.ResourceData, key string) (b bool) {
 	v, ok := get(d, key)
 	if ok {
 		b = v.(bool)
@@ -35,7 +35,7 @@ func Bool(d helper.Data, key string) (b bool) {
 
 // BoolPtr accesses the value held by key and type asserts it as a pointer to
 // a bool.
-func BoolPtr(d helper.Data, key string) (b *bool) {
+func BoolPtr(d helper.ResourceData, key string) (b *bool) {
 	v, ok := get(d, key)
 	if ok {
 		tmp := v.(bool)
@@ -45,7 +45,7 @@ func BoolPtr(d helper.Data, key string) (b *bool) {
 }
 
 // Int32 accesses the value held by key and type asserts it as a int32.
-func Int32(d helper.Data, key string) (i int32) {
+func Int32(d helper.ResourceData, key string) (i int32) {
 	v, ok := get(d, key)
 	if ok {
 		i = v.(int32)
@@ -55,7 +55,7 @@ func Int32(d helper.Data, key string) (i int32) {
 
 // Int32Ptr accesses the value held by key and type asserts it as a pointer to
 // a int32.
-func Int32Ptr(d helper.Data, key string) (i *int32) {
+func Int32Ptr(d helper.ResourceData, key string) (i *int32) {
 	v, ok := get(d, key)
 	if ok {
 		tmp := v.(int32)
@@ -65,7 +65,7 @@ func Int32Ptr(d helper.Data, key string) (i *int32) {
 }
 
 // Uint32 accesses the value held by key and type asserts it as a uint32.
-func Uint32(d helper.Data, key string) (u uint32) {
+func Uint32(d helper.ResourceData, key string) (u uint32) {
 	v, ok := get(d, key)
 	if ok {
 		u = v.(uint32)
@@ -75,7 +75,7 @@ func Uint32(d helper.Data, key string) (u uint32) {
 
 // Uint32Ptr accesses the value held by key and type asserts it as a pointer to
 // a uint32.
-func Uint32Ptr(d helper.Data, key string) (u *uint32) {
+func Uint32Ptr(d helper.ResourceData, key string) (u *uint32) {
 	v, ok := get(d, key)
 	if ok {
 		tmp := v.(uint32)
@@ -85,7 +85,7 @@ func Uint32Ptr(d helper.Data, key string) (u *uint32) {
 }
 
 // Int64 accesses the value held by key and type asserts it as a int64.
-func Int64(d helper.Data, key string) (i int64) {
+func Int64(d helper.ResourceData, key string) (i int64) {
 	v, ok := get(d, key)
 	if ok {
 		i = v.(int64)
@@ -95,7 +95,7 @@ func Int64(d helper.Data, key string) (i int64) {
 
 // Int64Ptr accesses the value held by key and type asserts it as a pointer to
 // a int64.
-func Int64Ptr(d helper.Data, key string) (i *int64) {
+func Int64Ptr(d helper.ResourceData, key string) (i *int64) {
 	v, ok := get(d, key)
 	if ok {
 		tmp := v.(int64)
@@ -105,7 +105,7 @@ func Int64Ptr(d helper.Data, key string) (i *int64) {
 }
 
 // Uint64 accesses the value held by key and type asserts it as a uint64.
-func Uint64(d helper.Data, key string) (u uint64) {
+func Uint64(d helper.ResourceData, key string) (u uint64) {
 	v, ok := get(d, key)
 	if ok {
 		u = v.(uint64)
@@ -115,7 +115,7 @@ func Uint64(d helper.Data, key string) (u uint64) {
 
 // Uint64Ptr accesses the value held by key and type asserts it as a pointer to
 // a uint64.
-func Uint64Ptr(d helper.Data, key string) (u *uint64) {
+func Uint64Ptr(d helper.ResourceData, key string) (u *uint64) {
 	v, ok := get(d, key)
 	if ok {
 		tmp := v.(uint64)
@@ -125,7 +125,7 @@ func Uint64Ptr(d helper.Data, key string) (u *uint64) {
 }
 
 // Int accesses the value held by key and type asserts it as a int.
-func Int(d helper.Data, key string) (i int) {
+func Int(d helper.ResourceData, key string) (i int) {
 	v, ok := get(d, key)
 	if ok {
 		i = v.(int)
@@ -135,7 +135,7 @@ func Int(d helper.Data, key string) (i int) {
 
 // IntPtr accesses the value held by key and type asserts it as a pointer to
 // a int.
-func IntPtr(d helper.Data, key string) (i *int) {
+func IntPtr(d helper.ResourceData, key string) (i *int) {
 	v, ok := get(d, key)
 	if ok {
 		tmp := v.(int)
@@ -145,7 +145,7 @@ func IntPtr(d helper.Data, key string) (i *int) {
 }
 
 // Uint accesses the value held by key and type asserts it as a uint.
-func Uint(d helper.Data, key string) (u uint) {
+func Uint(d helper.ResourceData, key string) (u uint) {
 	v, ok := get(d, key)
 	if ok {
 		u = v.(uint)
@@ -155,7 +155,7 @@ func Uint(d helper.Data, key string) (u uint) {
 
 // UintPtr accesses the value held by key and type asserts it as a pointer to
 // a uint.
-func UintPtr(d helper.Data, key string) (u *uint) {
+func UintPtr(d helper.ResourceData, key string) (u *uint) {
 	v, ok := get(d, key)
 	if ok {
 		tmp := v.(uint)
@@ -165,7 +165,7 @@ func UintPtr(d helper.Data, key string) (u *uint) {
 }
 
 // Float32 accesses the value held by key and type asserts it as a float32.
-func Float32(d helper.Data, key string) (f float32) {
+func Float32(d helper.ResourceData, key string) (f float32) {
 	v, ok := get(d, key)
 	if ok {
 		f = v.(float32)
@@ -175,7 +175,7 @@ func Float32(d helper.Data, key string) (f float32) {
 
 // Float32Ptr accesses the value held by key and type asserts it as a pointer to
 // a float32.
-func Float32Ptr(d helper.Data, key string) (f *float32) {
+func Float32Ptr(d helper.ResourceData, key string) (f *float32) {
 	v, ok := get(d, key)
 	if ok {
 		tmp := v.(float32)
@@ -185,7 +185,7 @@ func Float32Ptr(d helper.Data, key string) (f *float32) {
 }
 
 // Float64 accesses the value held by key and type asserts it as a float64.
-func Float64(d helper.Data, key string) (f float64) {
+func Float64(d helper.ResourceData, key string) (f float64) {
 	v, ok := get(d, key)
 	if ok {
 		f = v.(float64)
@@ -195,7 +195,7 @@ func Float64(d helper.Data, key string) (f float64) {
 
 // Float64Ptr accesses the value held by key and type asserts it as a pointer to
 // a float64.
-func Float64Ptr(d helper.Data, key string) (f *float64) {
+func Float64Ptr(d helper.ResourceData, key string) (f *float64) {
 	v, ok := get(d, key)
 	if ok {
 		tmp := v.(float64)
@@ -205,7 +205,7 @@ func Float64Ptr(d helper.Data, key string) (f *float64) {
 }
 
 // Complex64 accesses the value held by key and type asserts it as a complex64.
-func Complex64(d helper.Data, key string) (c complex64) {
+func Complex64(d helper.ResourceData, key string) (c complex64) {
 	v, ok := get(d, key)
 	if ok {
 		c = v.(complex64)
@@ -215,7 +215,7 @@ func Complex64(d helper.Data, key string) (c complex64) {
 
 // Complex64Ptr accesses the value held by key and type asserts it as a pointer to
 // a complex64.
-func Complex64Ptr(d helper.Data, key string) (c *complex64) {
+func Complex64Ptr(d helper.ResourceData, key string) (c *complex64) {
 	v, ok := get(d, key)
 	if ok {
 		tmp := v.(complex64)
@@ -225,7 +225,7 @@ func Complex64Ptr(d helper.Data, key string) (c *complex64) {
 }
 
 // Complex128 accesses the value held by key and type asserts it as a complex128.
-func Complex128(d helper.Data, key string) (c complex128) {
+func Complex128(d helper.ResourceData, key string) (c complex128) {
 	v, ok := get(d, key)
 	if ok {
 		c = v.(complex128)
@@ -235,7 +235,7 @@ func Complex128(d helper.Data, key string) (c complex128) {
 
 // Complex128Ptr accesses the value held by key and type asserts it as a pointer to
 // a complex128.
-func Complex128Ptr(d helper.Data, key string) (c *complex128) {
+func Complex128Ptr(d helper.ResourceData, key string) (c *complex128) {
 	v, ok := get(d, key)
 	if ok {
 		tmp := v.(complex128)

@@ -14,35 +14,44 @@ import (
 
 type data struct {
 	prefix string
-	helper.Data
+	helper.ResourceData
 }
 
-func dataAtKey(key string, d helper.Data) helper.Data { return &data{key, d} }
-func dataAtIndex(i int, d helper.Data) helper.Data    { return &data{strconv.Itoa(i), d} }
+func dataAtKey(key string, d helper.ResourceData) helper.ResourceData {
+	return &data{key, d}
+}
+
+func dataAtIndex(i int, d helper.ResourceData) helper.ResourceData {
+	return &data{strconv.Itoa(i), d}
+}
 
 func (d *data) IsNewResource() bool {
-	return d.Data.IsNewResource()
+	return d.ResourceData.IsNewResource()
 }
 
 func (d *data) HasChange(key string) bool {
-	return d.Data.HasChange(d.prefix + "." + key)
+	return d.ResourceData.HasChange(d.prefix + "." + key)
 }
 
 func (d *data) GetChange(key string) (interface{}, interface{}) {
-	return d.Data.GetChange(d.prefix + "." + key)
+	return d.ResourceData.GetChange(d.prefix + "." + key)
 }
 
 func (d *data) Get(key string) interface{} {
-	return d.Data.Get(d.prefix + "." + key)
+	return d.ResourceData.Get(d.prefix + "." + key)
+}
+
+func (d *data) GetOk(key string) (interface{}, bool) {
+	return d.ResourceData.GetOk(d.prefix + "." + key)
 }
 
 func (d *data) GetOkExists(key string) (interface{}, bool) {
-	return d.Data.GetOkExists(d.prefix + "." + key)
+	return d.ResourceData.GetOkExists(d.prefix + "." + key)
 }
 
-var _ helper.Data = (*data)(nil)
+var _ helper.ResourceData = (*data)(nil)
 
-func get(d helper.Data, key string) (v interface{}, ok bool) {
+func get(d helper.ResourceData, key string) (v interface{}, ok bool) {
 	if d.IsNewResource() || d.HasChange(key) {
 		v, ok = d.GetOkExists(key)
 	}
@@ -50,7 +59,7 @@ func get(d helper.Data, key string) (v interface{}, ok bool) {
 }
 
 // Slice accesses the value held by key and type asserts it to a slice.
-func Slice(d helper.Data, key string) (s []interface{}) {
+func Slice(d helper.ResourceData, key string) (s []interface{}) {
 	if d.IsNewResource() || d.HasChange(key) {
 		v, ok := d.GetOkExists(key)
 		if ok {
@@ -61,7 +70,7 @@ func Slice(d helper.Data, key string) (s []interface{}) {
 }
 
 // Map accesses the value held by key and type asserts it to a map.
-func Map(d helper.Data, key string) (m map[string]interface{}) {
+func Map(d helper.ResourceData, key string) (m map[string]interface{}) {
 	if d.IsNewResource() || d.HasChange(key) {
 		v, ok := d.GetOkExists(key)
 		if ok {
@@ -73,7 +82,7 @@ func Map(d helper.Data, key string) (m map[string]interface{}) {
 
 // List accesses the value held by key and returns an iterator able to go over
 // its elements.
-func List(d helper.Data, key string) Iterator {
+func List(d helper.ResourceData, key string) Iterator {
 	if d.IsNewResource() || d.HasChange(key) {
 		v, ok := d.GetOkExists(key)
 		if ok {
@@ -85,7 +94,7 @@ func List(d helper.Data, key string) Iterator {
 
 // Set accesses the value held by key, type asserts it to a set and returns an
 // iterator able to go over its elements.
-func Set(d helper.Data, key string) Iterator {
+func Set(d helper.ResourceData, key string) Iterator {
 	if d.IsNewResource() || d.HasChange(key) {
 		v, ok := d.GetOkExists(key)
 		if ok {
@@ -117,7 +126,7 @@ type Iterator interface {
 	// 	})
 	//
 	// making data access more intuitive for nested structures.
-	Elem(func(d helper.Data))
+	Elem(func(d helper.ResourceData))
 
 	// Range iterates over all elements of the list, calling fn in each iteration.
 	Range(func(k int, v interface{}))
@@ -127,7 +136,7 @@ type Iterator interface {
 }
 
 type list struct {
-	d helper.Data
+	d helper.ResourceData
 	v []interface{}
 }
 
@@ -137,7 +146,7 @@ func (l *list) Range(fn func(key int, value interface{})) {
 	}
 }
 
-func (l *list) Elem(fn func(helper.Data)) {
+func (l *list) Elem(fn func(helper.ResourceData)) {
 	for idx := range l.v {
 		fn(dataAtIndex(idx, l.d))
 	}
@@ -148,7 +157,7 @@ func (l *list) List() []interface{} {
 }
 
 type set struct {
-	d helper.Data
+	d helper.ResourceData
 	s *schema.Set
 }
 
@@ -166,7 +175,7 @@ func (s *set) Range(fn func(key int, value interface{})) {
 	}
 }
 
-func (s *set) Elem(fn func(helper.Data)) {
+func (s *set) Elem(fn func(helper.ResourceData)) {
 	for _, v := range s.s.List() {
 		fn(dataAtKey(s.hash(v), s.d))
 	}
@@ -179,7 +188,7 @@ func (s *set) List() []interface{} {
 // Diff accesses the value held by key and type asserts it to a set. It then
 // compares it's changes if any and returns what needs to be added and what
 // needs to be removed.
-func Diff(d helper.Data, key string) (add []interface{}, rm []interface{}) {
+func Diff(d helper.ResourceData, key string) (add []interface{}, rm []interface{}) {
 	if d.IsNewResource() {
 		add = Set(d, key).List()
 	}
@@ -192,7 +201,7 @@ func Diff(d helper.Data, key string) (add []interface{}, rm []interface{}) {
 }
 
 // JSON accesses the value held by key and unmarshals it into a map.
-func JSON(d helper.Data, key string) (m map[string]interface{}, err error) {
+func JSON(d helper.ResourceData, key string) (m map[string]interface{}, err error) {
 	if d.IsNewResource() || d.HasChange(key) {
 		v, ok := d.GetOkExists(key)
 		if ok {

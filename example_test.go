@@ -15,7 +15,7 @@ type mountList []*Mount
 
 func (m mountList) Len() int { return len(m) }
 
-func (m mountList) Flatten(i int, d helper.Data) {
+func (m mountList) Flatten(i int, d helper.ResourceData) {
 	d.Set("target", m[i].Target)
 	d.Set("source", m[i].Source)
 	d.Set("type", m[i].Type)
@@ -28,12 +28,12 @@ func ExampleFlatten() {
 
 	if spec := api.Spec; spec != nil {
 
-		d.Set("task_spec", flatten.FlattenFunc(func(d helper.Data) {
+		d.Set("task_spec", flatten.FlattenFunc(func(d helper.ResourceData) {
 
 			if taskTemplate := spec.TaskTemplate; taskTemplate != nil {
 				if containerSpec := taskTemplate.ContainerSpec; containerSpec != nil {
 
-					d.Set("container_spec", flatten.FlattenFunc(func(d helper.Data) {
+					d.Set("container_spec", flatten.FlattenFunc(func(d helper.ResourceData) {
 
 						if mounts := containerSpec.Mounts; mounts != nil {
 
@@ -60,16 +60,16 @@ func ExampleExpand() {
 	api := &API{}
 	api.Spec = &Spec{}
 
-	expand.List(d, "task_spec").Elem(func(d helper.Data) {
+	expand.List(d, "task_spec").Elem(func(d helper.ResourceData) {
 
 		api.Spec.TaskTemplate = &TaskTemplate{}
 		api.Spec.TaskTemplate.ContainerSpec = &ContainerSpec{}
 
-		expand.List(d, "container_spec").Elem(func(d helper.Data) {
+		expand.List(d, "container_spec").Elem(func(d helper.ResourceData) {
 
 			api.Spec.TaskTemplate.ContainerSpec.Mounts = make([]*Mount, 0)
 
-			expand.Set(d, "mounts").Elem(func(d helper.Data) {
+			expand.Set(d, "mounts").Elem(func(d helper.ResourceData) {
 				api.Spec.TaskTemplate.ContainerSpec.Mounts = append(api.Spec.TaskTemplate.ContainerSpec.Mounts, &Mount{
 					Target: expand.String(d, "target"),
 					Source: expand.String(d, "source"),

@@ -8,16 +8,16 @@ import (
 
 // A Flattener is used to flatten data into Terraform's internal representation.
 type Flattener interface {
-	Flatten(helper.Data)
+	Flatten(helper.ResourceData)
 }
 
 // The FlattenerFunc type is an adapter to allow the use of an ordinary function
 // as a Flattener. If f is a function with the appropriate signature,
 // FlattenerFunc(f) is a Flattener that calls f.
-type FlattenerFunc func(helper.Data)
+type FlattenerFunc func(helper.ResourceData)
 
 // Flatten calls f(m).
-func (fn FlattenerFunc) Flatten(d helper.Data) {
+func (fn FlattenerFunc) Flatten(d helper.ResourceData) {
 	fn(d)
 }
 
@@ -31,7 +31,7 @@ func Flatten(f Flattener) []interface{} {
 
 // FlattenFunc executes the provided function and wraps the result in a
 // []interface{} which is used by Terraform list or set types.
-func FlattenFunc(fn func(helper.Data)) []interface{} {
+func FlattenFunc(fn func(helper.ResourceData)) []interface{} {
 	return Flatten(FlattenerFunc(fn))
 }
 
@@ -44,7 +44,7 @@ type List interface {
 	// Len returns the number of elements in the collection.
 	Len() int
 	// Flatten flattens the element at index i into data d.
-	Flatten(i int, d helper.Data)
+	Flatten(i int, d helper.ResourceData)
 }
 
 // FlattenerList is an implementation of List used to flatten []Flattener.
@@ -54,7 +54,7 @@ type FlattenerList []Flattener
 func (f FlattenerList) Len() int { return len(f) }
 
 // Flatten flattens the element at index i into data d.
-func (f FlattenerList) Flatten(i int, d helper.Data) { f[i].Flatten(d) }
+func (f FlattenerList) Flatten(i int, d helper.ResourceData) { f[i].Flatten(d) }
 
 // FlattenList flattens a List by iterating the List's elements and executing
 // their Flatten method.

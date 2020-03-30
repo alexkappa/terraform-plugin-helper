@@ -98,7 +98,7 @@ func TestExpand(t *testing.T) {
 	var it Iterator
 
 	it = List(d, "list")
-	it.Elem(func(d helper.Data) {
+	it.Elem(func(d helper.ResourceData) {
 		Expect(t, String(d, "foo"), "bar")
 		Expect(t, Int(d, "bar"), 123)
 	})
@@ -110,7 +110,7 @@ func TestExpand(t *testing.T) {
 	})
 
 	it = Set(d, "set")
-	it.Elem(func(d helper.Data) {
+	it.Elem(func(d helper.ResourceData) {
 		Expect(t, String(d, "foo"), "bar")
 		Expect(t, Int(d, "bar"), 123)
 	})
