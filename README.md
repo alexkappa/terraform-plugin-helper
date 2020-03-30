@@ -1,4 +1,4 @@
-# terraform-plugin-helper
+# terraform-plugin-helper [![GoDoc](https://godoc.org/github.com/alexkappa/terraform-plugin-helper/helper?status.svg)](https://godoc.org/github.com/alexkappa/terraform-plugin-helper/helper)
 
 Re-usable helpers for building your next terraform provider.
 
@@ -71,29 +71,27 @@ Using the same schema as an example, here's how we would write the `resourceServ
 ```go
 func resourceServerCreate(d *schema.ResourceData, m interface{}) error {
 
-  api := &API{Spec: &Spec{}}
-
+  api := &API{}
+  api.Spec = &Spec{}
+  
   expand.List(d, "task_spec").Elem(func(d helper.Data) {
 
-    containerSpec := &ContainerSpec{}
+    api.Spec.TaskTemplate = &TaskTemplate{}
+    api.Spec.TaskTemplate.ContainerSpec = &ContainerSpec{}
 
     expand.List(d, "container_spec").Elem(func(d helper.Data) {
 
-      mounts := make([]*Mount, 0)
+      api.Spec.TaskTemplate.ContainerSpec.Mounts = make([]*Mount, 0)
 
       expand.Set(d, "mounts").Elem(func(d helper.Data) {
 
-        mounts = append(mounts, &Mount{
+        api.Spec.TaskTemplate.ContainerSpec.Mounts = append(api.Spec.TaskTemplate.ContainerSpec.Mounts, &Mount{
           Target: expand.String(d, "target"),
           Source: expand.String(d, "source"),
           Type:   expand.String(d, "type"),
         })
       })
-
-      containerSpec.Mounts = make([]*Mount, 0)
     })
-
-    api.Spec.TaskTemplate = &TaskTemplate{containerSpec}
   })
 }
 ```

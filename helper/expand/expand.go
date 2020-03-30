@@ -1,3 +1,5 @@
+// Package expand contains helper functions used to map terraform configuration
+// to an API object.
 package expand
 
 //go:generate go run gen.go > expand.gen.go

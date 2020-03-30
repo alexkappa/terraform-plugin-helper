@@ -1,3 +1,5 @@
+// Package flatten contains helper functions to deal with arbitrary data
+// structures with terraform providers.
 package flatten
 
 import (
