@@ -29,12 +29,12 @@ func resourceServerRead(d *schema.ResourceData, m interface{}) error {
 
   d.Set("address", server.Address)
 
-  d.Set("task_spec", flatten.FlattenFunc(func(d helper.Data) {
+  d.Set("task_spec", flatten.FlattenFunc(func(d helper.ResourceData) {
   
   if taskTemplate := spec.TaskTemplate; taskTemplate != nil {
       if containerSpec := taskTemplate.ContainerSpec; containerSpec != nil {
         
-        d.Set("container_spec", flatten.FlattenFunc(func (d helper.Data) {
+        d.Set("container_spec", flatten.FlattenFunc(func (d helper.ResourceData) {
   
           if mounts := containerSpec.Mounts; mounts != nil {
             d.Set("mounts", flatten.FlattenList(mountList(mounts)))
@@ -48,21 +48,21 @@ func resourceServerRead(d *schema.ResourceData, m interface{}) error {
 }
 ```
 
-`mountList` wraps to the `[]*Mount` structure from the server response and implements the `List` interface so we can use it with the  `FlattenList` function.
+`mountList` wraps to the `[]*Mount` structure from the server response and implements the `flatten.List` interface so we can use it as an argument to the  `FlattenList` function.
 
 ```go
 type mountList []*Mount
 
 func (m mountList) Len() int { return len(m) }
 
-func (m mountList) Flatten(i int, d helper.Data) {
+func (m mountList) Flatten(i int, d helper.ResourceData) {
 	d.Set("target", m[i].Target)
 	d.Set("source", m[i].Source)
 	d.Set("type", m[i].Type)
 }
 ```
 
-In this example, we've used `flatten.FlattenFunc` mainly to flatten a nested data structure. If the data structures themselves implement `flatten.Flattener` it can flatten itself. Then the example becomes much easier, using `flatten.Flatten`.
+In this example, we've mainly used `flatten.FlattenFunc` to flatten a nested data structure. However a `flatten.Flatten` function also exists which can be used with data structures that implement `flatten.Flattener`.
 
 ## Expand
 
@@ -74,16 +74,16 @@ func resourceServerCreate(d *schema.ResourceData, m interface{}) error {
   api := &API{}
   api.Spec = &Spec{}
   
-  expand.List(d, "task_spec").Elem(func(d helper.Data) {
+  expand.List(d, "task_spec").Elem(func(d helper.ResourceData) {
 
     api.Spec.TaskTemplate = &TaskTemplate{}
     api.Spec.TaskTemplate.ContainerSpec = &ContainerSpec{}
 
-    expand.List(d, "container_spec").Elem(func(d helper.Data) {
+    expand.List(d, "container_spec").Elem(func(d helper.ResourceData) {
 
       api.Spec.TaskTemplate.ContainerSpec.Mounts = make([]*Mount, 0)
 
-      expand.Set(d, "mounts").Elem(func(d helper.Data) {
+      expand.Set(d, "mounts").Elem(func(d helper.ResourceData) {
 
         api.Spec.TaskTemplate.ContainerSpec.Mounts = append(api.Spec.TaskTemplate.ContainerSpec.Mounts, &Mount{
           Target: expand.String(d, "target"),

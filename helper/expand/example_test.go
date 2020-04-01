@@ -5,14 +5,14 @@ import (
 
 	"github.com/alexkappa/terraform-plugin-helper/helper"
 	"github.com/alexkappa/terraform-plugin-helper/helper/expand"
-	"github.com/aws/aws-sdk-go/service/ec2"
+	"github.com/alexkappa/terraform-plugin-helper/internal/aws/aws-sdk-go/service/ec2"
 )
 
 var d helper.ResourceData
 
-func ExampleSet_Elem() {
+func ExampleSet() {
 
-	blockDevices := make([]*ec2.BlockDeviceMapping, 0)
+	var blockDevices []*ec2.BlockDeviceMapping
 
 	expand.Set(d, "ebs_block_device").Elem(func(d helper.ResourceData) {
 
