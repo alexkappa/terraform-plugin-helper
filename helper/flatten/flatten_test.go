@@ -20,7 +20,7 @@ func TestFlatten(t *testing.T) {
 }
 
 func TestFlattenFunc(t *testing.T) {
-	flat := FlattenFunc(func(d helper.ResourceData) {
+	flat := Func(func(d helper.ResourceData) {
 		d.Set("foo", "bar")
 	})
 	t.Logf("%v", flat) // [map[foo:bar]]
@@ -31,12 +31,12 @@ type flattenerList []flattener
 func (f flattenerList) Len() int                             { return len(f) }
 func (f flattenerList) Flatten(i int, d helper.ResourceData) { f[i].Flatten(d) }
 
-func TestFlattenList(t *testing.T) {
+func TestList(t *testing.T) {
 	flatteners := []flattener{
-		flattener{"bar"},
-		flattener{"baz"},
+		{"bar"},
+		{"baz"},
 	}
-	flat := FlattenList(flattenerList(flatteners))
+	flat := List(flattenerList(flatteners))
 	t.Logf("%v", flat) // [map[foo:bar] map[foo:baz]]
 }
 
@@ -44,30 +44,28 @@ type item struct{ name string }
 
 type itemFlattener item
 
-func (i itemFlattener) Flatten(d helper.ResourceData) {
-	d.Set("name", i.name)
-}
+func (i itemFlattener) Flatten(d helper.ResourceData) { d.Set("name", i.name) }
 
-func TestFlattenListWrap(t *testing.T) {
-	flatteners := []Flattener{
+func TestListWrap(t *testing.T) {
+	items := []Flattener{
 		itemFlattener(item{"bar"}),
 		itemFlattener(item{"baz"}),
 	}
-	flat := FlattenList(FlattenerList(flatteners))
+	flat := List(Flatteners(items))
 	t.Logf("%v", flat) // [map[name:bar] map[name:baz]]
 }
 
-func itemFlattenerAlt(i item) Flattener {
+func itemFlattenerFunc(i item) Flattener {
 	return FlattenerFunc(func(d helper.ResourceData) {
 		d.Set("name", i.name)
 	})
 }
 
-func TestFlattenListWrapAlt(t *testing.T) {
-	flatteners := []Flattener{
-		itemFlattenerAlt(item{"bar"}),
-		itemFlattenerAlt(item{"baz"}),
+func TestListWrapFunc(t *testing.T) {
+	items := []Flattener{
+		itemFlattenerFunc(item{"bar"}),
+		itemFlattenerFunc(item{"baz"}),
 	}
-	flat := FlattenList(FlattenerList(flatteners))
+	flat := List(Flatteners(items))
 	t.Logf("%v", flat) // [map[name:bar] map[name:baz]]
 }

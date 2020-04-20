@@ -28,16 +28,16 @@ func ExampleFlatten() {
 
 	if spec := api.Spec; spec != nil {
 
-		d.Set("task_spec", flatten.FlattenFunc(func(d helper.ResourceData) {
+		d.Set("task_spec", flatten.Func(func(d helper.ResourceData) {
 
 			if taskTemplate := spec.TaskTemplate; taskTemplate != nil {
 				if containerSpec := taskTemplate.ContainerSpec; containerSpec != nil {
 
-					d.Set("container_spec", flatten.FlattenFunc(func(d helper.ResourceData) {
+					d.Set("container_spec", flatten.Func(func(d helper.ResourceData) {
 
 						if mounts := containerSpec.Mounts; mounts != nil {
 
-							d.Set("mounts", flatten.FlattenList(mountList(mounts)))
+							d.Set("mounts", flatten.List(mountList(mounts)))
 						}
 					}))
 				}

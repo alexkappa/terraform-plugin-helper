@@ -29,36 +29,27 @@ func Flatten(f Flattener) []interface{} {
 	return []interface{}{map[string]interface{}(d)}
 }
 
-// FlattenFunc executes the provided function and wraps the result in a
-// []interface{} which is used by Terraform list or set types.
-func FlattenFunc(fn func(helper.ResourceData)) []interface{} {
+// Func executes the provided function and wraps the result in a []interface{}
+// which is used by Terraform list or set types.
+func Func(fn func(helper.ResourceData)) []interface{} {
 	return Flatten(FlattenerFunc(fn))
 }
 
-// List is used when flattening list or set types into Terraform's internal
-// representation.
+// FlattenerList is used when flattening list or set types into Terraform's
+// internal representation.
 //
 // The methods require that the elements of the collection be enumerated by an
 // integer index.
-type List interface {
+type FlattenerList interface {
 	// Len returns the number of elements in the collection.
 	Len() int
 	// Flatten flattens the element at index i into data d.
 	Flatten(i int, d helper.ResourceData)
 }
 
-// FlattenerList is an implementation of List used to flatten []Flattener.
-type FlattenerList []Flattener
-
-// Len returns the number of elements in the collection.
-func (f FlattenerList) Len() int { return len(f) }
-
-// Flatten flattens the element at index i into data d.
-func (f FlattenerList) Flatten(i int, d helper.ResourceData) { f[i].Flatten(d) }
-
-// FlattenList flattens a List by iterating the List's elements and executing
+// List flattens a ListFlattener by iterating the List's elements and calling
 // their Flatten method.
-func FlattenList(l List) []interface{} {
+func List(l FlattenerList) []interface{} {
 	out := make([]interface{}, 0, l.Len())
 	for i := 0; i < l.Len(); i++ {
 		d := make(helper.MapData)
@@ -67,3 +58,9 @@ func FlattenList(l List) []interface{} {
 	}
 	return out
 }
+
+// Flatteners is a type alias for []Flattener which implmements FlattenerList.
+type Flatteners []Flattener
+
+func (f Flatteners) Len() int                             { return len(f) }
+func (f Flatteners) Flatten(i int, d helper.ResourceData) { f[i].Flatten(d) }
