@@ -6,7 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
-// The ResourceData interface represents a schema.ResourceData and defines some
+// The ResourceData interface generalizes a schema.ResourceData and defines some
 // of its methods that are commonly used by the helper packages.
 type ResourceData interface {
 

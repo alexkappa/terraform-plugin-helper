@@ -5,7 +5,7 @@ import (
 
 	"github.com/alexkappa/terraform-plugin-helper/helper"
 	"github.com/alexkappa/terraform-plugin-helper/helper/expand"
-	"github.com/alexkappa/terraform-plugin-helper/internal/aws/aws-sdk-go/service/ec2"
+	"github.com/alexkappa/terraform-plugin-helper/internal/testing/mock/aws/aws-sdk-go/service/ec2"
 )
 
 var d helper.ResourceData

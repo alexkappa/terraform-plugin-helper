@@ -1,0 +1,31 @@
+// This code is experimental. It relies on unsupported generics features that 
+// are not yet part of the language.
+//
+// See:
+// - https://ccbrown.github.io/wasm-go-playground
+// - https://bit.ly/2Vqi6zm
+package flatten
+
+import "github.com/alexkappa/terraform-plugin-helper/helper"
+
+contract flatten(T) {
+    T Flatten(helper.ResourceData)
+}
+
+func List(type F flatten)(in []F) []interface{} {
+    out := make([]interface{}, len(in))
+    for i, f := range in {
+        d := make(helper.MapData)
+        out[i] = f.Flatten(d)
+    }
+	return out
+}
+
+func ListFunc(type F)(in []F, fn func(F, helper.ResourceData)) []interface{} {
+    out := make([]interface{}, len(in))
+    for i, f := range in {
+        d := make(helper.MapData)
+        out[i] = fn(f, d)
+    }
+	return out
+}

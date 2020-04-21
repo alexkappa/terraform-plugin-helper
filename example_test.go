@@ -37,7 +37,7 @@ func ExampleFlatten() {
 
 						if mounts := containerSpec.Mounts; mounts != nil {
 
-							d.Set("mounts", flatten.List(mountList(mounts)))
+							d.Set("mounts", flatten.FlattenList(mountList(mounts)))
 						}
 					}))
 				}

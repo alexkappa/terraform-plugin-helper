@@ -2,9 +2,7 @@
 // structures with terraform providers.
 package flatten
 
-import (
-	"github.com/alexkappa/terraform-plugin-helper/helper"
-)
+import "github.com/alexkappa/terraform-plugin-helper/helper"
 
 // A Flattener is used to flatten data into Terraform's internal representation.
 type Flattener interface {
@@ -35,21 +33,21 @@ func Func(fn func(helper.ResourceData)) []interface{} {
 	return Flatten(FlattenerFunc(fn))
 }
 
-// FlattenerList is used when flattening list or set types into Terraform's
-// internal representation.
+// List is used when flattening list or set types into Terraform's internal
+// representation.
 //
 // The methods require that the elements of the collection be enumerated by an
 // integer index.
-type FlattenerList interface {
+type List interface {
 	// Len returns the number of elements in the collection.
 	Len() int
 	// Flatten flattens the element at index i into data d.
 	Flatten(i int, d helper.ResourceData)
 }
 
-// List flattens a ListFlattener by iterating the List's elements and calling
+// FlattenList flattens the provider List by iterating its elements and calling
 // their Flatten method.
-func List(l FlattenerList) []interface{} {
+func FlattenList(l List) []interface{} {
 	out := make([]interface{}, 0, l.Len())
 	for i := 0; i < l.Len(); i++ {
 		d := make(helper.MapData)
@@ -59,7 +57,7 @@ func List(l FlattenerList) []interface{} {
 	return out
 }
 
-// Flatteners is a type alias for []Flattener which implmements FlattenerList.
+// Flatteners is a type alias for []Flattener which implmements Flatteners.
 type Flatteners []Flattener
 
 func (f Flatteners) Len() int                             { return len(f) }
